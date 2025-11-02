@@ -1,0 +1,11 @@
+# Ensure consistent line endings for text/code files
+* text=auto
+*.js text
+*.jsx text
+*.css text
+*.html text
+*.json text
+*.md text
+
+# Leave .env and other sensitive files untouched
+.env binary
