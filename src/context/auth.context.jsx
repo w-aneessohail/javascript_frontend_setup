@@ -1,32 +1,32 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import useAxios from "../hook/useAxios.hook";
+import useAxios from "@/hook/useAxios.hook";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const { response, fetchData } = useAxios();
+  const { fetchData } = useAxios();
   const [user, setUser] = useState(null);
   const [initialized, setInitialized] = useState(false);
+
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    // attempt to fetch current profile if token exists
-    fetchData({ url: "profile", method: "get" });
+    const loadProfile = async () => {
+      const result = await fetchData({ url: "/profile", method: "get" });
+      if (result && result.foundUser) {
+        setUser(result.foundUser);
+      }
+      setInitialized(true);
+    };
+    loadProfile();
   }, [fetchData]);
 
-  useEffect(() => {
-    if (response) setUser(response);
-    setInitialized(true);
-  }, [response]);
-
-  const logout = () => {
+  const logout = async () => {
+    await fetchData({ url: "/logout", method: "post" });
     setUser(null);
-    try {
-      localStorage.removeItem("token");
-    } catch (e) {}
   };
 
-  if (!initialized) return <p>Loading...</p>;
+  if (!initialized) return <div>Loading...</div>;
 
   return (
     <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
