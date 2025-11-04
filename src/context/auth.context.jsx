@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useAxios from "@/hook/useAxios.hook";
 
 const AuthContext = createContext(null);
@@ -12,24 +12,36 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const result = await fetchData({ url: "/profile", method: "get" });
-      if (result && result.foundUser) {
-        setUser(result.foundUser);
+      try {
+        const result = await fetchData({ url: "/profile", method: "get" });
+        const userData =
+          result?.user || result?.foundUser || result?.data || result;
+
+        if (userData && userData.email) {
+          setUser(userData);
+        }
+      } catch (error) {
+        console.log("Error loading profile:", error.message);
+      } finally {
+        setInitialized(true);
       }
-      setInitialized(true);
     };
+
     loadProfile();
-  }, [fetchData]);
+  }, []);
 
-  const logout = async () => {
-    await fetchData({ url: "/logout", method: "post" });
-    setUser(null);
-  };
-
-  if (!initialized) return <div>Loading...</div>;
+  if (!initialized) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

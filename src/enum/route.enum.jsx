@@ -1,4 +1,4 @@
-export const RoutePath = Object.freeze({
+export const RoutePath = {
   HOME: "/",
   EVENTS: "/events",
   BOOKING: "/booking",
@@ -13,4 +13,4 @@ export const RoutePath = Object.freeze({
   ADMIN_DASHBOARD: "/dashboard/admin",
   ORGANIZER_DASHBOARD: "/dashboard/organizer",
   ATTENDEE_DASHBOARD: "/dashboard/attendee",
-});
+};

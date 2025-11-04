@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 const useAxios = () => {
@@ -11,51 +11,13 @@ const useAxios = () => {
     withCredentials: true,
   });
 
-  // ✅ Attach interceptor safely
-  useEffect(() => {
-    const interceptor = axiosInstance.interceptors.response.use(
-      (res) => res,
-      async (err) => {
-        const originalRequest = err.config;
-
-        // If unauthorized and we haven’t retried yet
-        if (
-          (err.response?.status === 401 || err.response?.status === 403) &&
-          !originalRequest._retry
-        ) {
-          const hasRefreshToken = document.cookie.includes("refresh_token");
-          if (!hasRefreshToken) {
-            console.warn("No refresh token found — skipping refresh.");
-            return Promise.reject(err);
-          }
-
-          originalRequest._retry = true;
-          try {
-            console.log("Attempting token refresh...");
-            await axiosInstance.post("/refresh");
-            return axiosInstance(originalRequest);
-          } catch (refreshError) {
-            console.error("Token refresh failed", refreshError);
-            return Promise.reject(refreshError);
-          }
-        }
-        return Promise.reject(err);
-      }
-    );
-
-    return () => {
-      axiosInstance.interceptors.response.eject(interceptor);
-    };
-  }, [axiosInstance]);
+  axiosInstance.interceptors.request.use((config) => {
+    // Cookies are automatically included with credentials: true
+    // Only access_token and refresh_token should be set by backend
+    return config;
+  });
 
   const fetchData = async ({ url, method = "get", data = {}, params = {} }) => {
-    // ✅ Skip API call if no access token & it’s a protected endpoint
-    const accessTokenExists = document.cookie.includes("access_token");
-    if (!accessTokenExists && url.includes("/profile")) {
-      console.warn("Skipping profile call — no access token found.");
-      return null;
-    }
-
     setLoading(true);
     setError(null);
 

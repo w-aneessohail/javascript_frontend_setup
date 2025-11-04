@@ -1,5 +1,4 @@
-import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "@/route/protectedRoute";
 import RoleRedirect from "@/route/roleRedirect";
 import { RoutePath } from "@/enum/route.enum";
@@ -29,7 +28,11 @@ import ResetPasswordFeature from "@/feature/auth/resetPassword.feature.auth";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/auth/login" replace />,
+    element: (
+      <ProtectedRoute>
+        <RoleRedirect />
+      </ProtectedRoute>
+    ),
   },
   {
     path: RoutePath.AUTH,
@@ -74,25 +77,31 @@ const router = createBrowserRouter([
       {
         path: "admin",
         element: (
-          <AdminLayout>
-            <AdminDashboardPage />
-          </AdminLayout>
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboardPage />
+            </AdminLayout>
+          </ProtectedRoute>
         ),
       },
       {
         path: "organizer",
         element: (
-          <OrganizerLayout>
-            <OrganizerDashboardPage />
-          </OrganizerLayout>
+          <ProtectedRoute>
+            <OrganizerLayout>
+              <OrganizerDashboardPage />
+            </OrganizerLayout>
+          </ProtectedRoute>
         ),
       },
       {
         path: "attendee",
         element: (
-          <AttendeeLayout>
-            <AttendeeDashboardPage />
-          </AttendeeLayout>
+          <ProtectedRoute>
+            <AttendeeLayout>
+              <AttendeeDashboardPage />
+            </AttendeeLayout>
+          </ProtectedRoute>
         ),
       },
     ],

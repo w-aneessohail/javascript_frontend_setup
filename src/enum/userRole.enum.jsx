@@ -1,5 +1,5 @@
-export const UserRole = Object.freeze({
+export const UserRole = {
   ADMIN: "admin",
   ORGANIZER: "organizer",
   ATTENDEE: "attendee",
-});
+};

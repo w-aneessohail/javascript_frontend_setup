@@ -1,39 +1,71 @@
-import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import useAxios from "../hook/useAxios.hook";
+import { useAuth } from "@/context/auth.context";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const AttendeeDashboardPage = () => {
-  const { response, loading, fetchData } = useAxios();
-  const [userData, setUserData] = useState(null);
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadProfile = async () => {
-      await fetchData({ url: "/profile", method: "get" });
-    };
-    loadProfile();
-  }, [fetchData]);
+    if (!isAuthenticated) {
+      navigate("/auth/login");
+    }
+  }, [isAuthenticated, navigate]);
 
-  useEffect(() => {
-    if (response) setUserData(response);
-  }, [response]);
-
-  if (loading || !userData) {
-    return (
-      <div className="container d-flex justify-content-center align-items-center vh-100">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
     <div className="container mt-5">
+      <div className="row mb-4">
+        <div className="col-md-12">
+          <div className="card shadow-lg p-4">
+            <div className="d-flex align-items-center gap-4">
+              <div>
+                <img
+                  src={user?.profileImageUrl || "/placeholder-user.jpg"}
+                  alt="profile"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "3px solid #007bff",
+                  }}
+                />
+              </div>
+              <div className="flex-grow-1">
+                <h2 className="mb-2">{user?.name}</h2>
+                <p className="mb-1">
+                  <strong>Email:</strong> {user?.email}
+                </p>
+                <p className="mb-1">
+                  <strong>Role:</strong>{" "}
+                  <span className="badge bg-primary">{user?.role}</span>
+                </p>
+                <p className="mb-0">
+                  <strong>Verified:</strong>{" "}
+                  <span
+                    className={
+                      user?.isVerified ? "badge bg-success" : "badge bg-warning"
+                    }
+                  >
+                    {user?.isVerified ? "Yes" : "No"}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="row">
         <div className="col-md-8 mx-auto">
           <div className="card shadow-lg p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Welcome, {userData.name}!</h2>
+              <h2>Welcome, {user?.name}!</h2>
             </div>
 
             <div className="card-body">
@@ -42,12 +74,12 @@ const AttendeeDashboardPage = () => {
               <div className="row mb-3">
                 <div className="col-md-6">
                   <p>
-                    <strong>Name:</strong> {userData.name}
+                    <strong>Name:</strong> {user?.name}
                   </p>
                 </div>
                 <div className="col-md-6">
                   <p>
-                    <strong>Email:</strong> {userData.email}
+                    <strong>Email:</strong> {user?.email}
                   </p>
                 </div>
               </div>
@@ -56,7 +88,7 @@ const AttendeeDashboardPage = () => {
                 <div className="col-md-6">
                   <p>
                     <strong>Role:</strong>{" "}
-                    <span className="badge bg-primary">{userData.role}</span>
+                    <span className="badge bg-primary">{user?.role}</span>
                   </p>
                 </div>
                 <div className="col-md-6">
@@ -64,18 +96,18 @@ const AttendeeDashboardPage = () => {
                     <strong>Verified:</strong>{" "}
                     <span
                       className={
-                        userData.isVerified
+                        user?.isVerified
                           ? "badge bg-success"
                           : "badge bg-warning"
                       }
                     >
-                      {userData.isVerified ? "Yes" : "No"}
+                      {user?.isVerified ? "Yes" : "No"}
                     </span>
                   </p>
                 </div>
               </div>
 
-              {userData.organizers && (
+              {user?.organizers && (
                 <>
                   <hr />
                   <h5 className="card-title mb-3">Organizer Details</h5>
@@ -84,13 +116,13 @@ const AttendeeDashboardPage = () => {
                     <div className="col-md-6">
                       <p>
                         <strong>Organization Name:</strong>{" "}
-                        {userData.organizers.organizationName}
+                        {user.organizers.organizationName}
                       </p>
                     </div>
                     <div className="col-md-6">
                       <p>
                         <strong>Organizer Name:</strong>{" "}
-                        {userData.organizers.organizerName}
+                        {user.organizers.organizerName}
                       </p>
                     </div>
                   </div>
@@ -98,12 +130,12 @@ const AttendeeDashboardPage = () => {
                   <div className="row mb-3">
                     <div className="col-md-6">
                       <p>
-                        <strong>CNIC:</strong> {userData.organizers.cnic}
+                        <strong>CNIC:</strong> {user.organizers.cnic}
                       </p>
                     </div>
                     <div className="col-md-6">
                       <p>
-                        <strong>Phone:</strong> {userData.organizers.phone}
+                        <strong>Phone:</strong> {user.organizers.phone}
                       </p>
                     </div>
                   </div>
@@ -111,7 +143,7 @@ const AttendeeDashboardPage = () => {
                   <div className="row mb-3">
                     <div className="col-md-12">
                       <p>
-                        <strong>Address:</strong> {userData.organizers.address}
+                        <strong>Address:</strong> {user.organizers.address}
                       </p>
                     </div>
                   </div>
@@ -120,7 +152,7 @@ const AttendeeDashboardPage = () => {
 
               <div className="alert alert-info mt-4">
                 <strong>Note:</strong> Your authentication token is stored as an{" "}
-                <code>HttpOnly</code> cookie. It’s automatically sent with each
+                <code>HttpOnly</code> cookie. It's automatically sent with each
                 request for security.
               </div>
             </div>
