@@ -1,35 +1,47 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import useAxios from "../hook/useAxios.hook";
+import { createContext, useContext, useEffect, useState } from "react";
+import useAxios from "@/hook/useAxios.hook";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const { response, fetchData } = useAxios();
+  const { fetchData } = useAxios();
   const [user, setUser] = useState(null);
   const [initialized, setInitialized] = useState(false);
+
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    // attempt to fetch current profile if token exists
-    fetchData({ url: "profile", method: "get" });
-  }, [fetchData]);
+    const loadProfile = async () => {
+      try {
+        const result = await fetchData({ url: "/profile", method: "get" });
+        const userData =
+          result?.user || result?.foundUser || result?.data || result;
 
-  useEffect(() => {
-    if (response) setUser(response);
-    setInitialized(true);
-  }, [response]);
+        if (userData && userData.email) {
+          setUser(userData);
+        }
+      } catch (error) {
+        console.log("Error loading profile:", error.message);
+      } finally {
+        setInitialized(true);
+      }
+    };
 
-  const logout = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem("token");
-    } catch (e) {}
-  };
+    loadProfile();
+  }, []);
 
-  if (!initialized) return <p>Loading...</p>;
+  if (!initialized) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

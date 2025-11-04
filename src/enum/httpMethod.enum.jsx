@@ -1,7 +1,7 @@
-export const HttpMethod = Object.freeze({
+export const HttpMethod = {
   GET: "get",
   POST: "post",
   PUT: "put",
   PATCH: "patch",
   DELETE: "delete",
-});
+};
