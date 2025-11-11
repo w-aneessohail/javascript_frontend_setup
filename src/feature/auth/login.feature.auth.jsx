@@ -1,30 +1,27 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import CustomInputField from "@/component/customInput.component";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import useAxios from "@/hook/useAxios.hook";
 import { useNavigate } from "react-router-dom";
-import { RoutePath, HttpMethod } from "@/enum";
+import { RoutePath, HttpMethod, UserRole } from "@/enum";
 import { useAuth } from "@/context/auth.context";
 
 const LoginFeature = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth(); // ✅ context
+  const { setUser } = useAuth();
   const loginApi = useAxios();
   const { fetchData, error, loading, response } = loginApi;
 
-  // ✅ Handle login success
   useEffect(() => {
     if (response && response.user) {
       const { user } = response;
       setUser(user);
 
-      // ✅ Redirect according to role
-      if (user.role === "ATTENDEE") navigate("/dashboard/attendee");
-      else if (user.role === "ORGANIZER") navigate("/dashboard/organizer");
-      else if (user.role === "ADMIN") navigate("/dashboard/admin");
-      else navigate(RoutePath.HOME);
+      if (user.role === UserRole.ATTENDEE) navigate("/attendee");
+      else if (user.role === UserRole.ORGANIZER) navigate("/organizer");
+      else if (user.role === UserRole.ADMIN) navigate("/admin");
     }
   }, [response, navigate, setUser]);
 
@@ -104,7 +101,7 @@ const LoginFeature = () => {
         </Form>
 
         <p className="text-center mt-3 mb-0">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <a href={RoutePath.REGISTER} className="text-decoration-none">
             Signup
           </a>

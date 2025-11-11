@@ -1,7 +1,5 @@
-import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/route/protectedRoute";
-import RoleRedirect from "@/route/roleRedirect";
 import { RoutePath } from "@/enum/route.enum";
 
 // layouts
@@ -12,11 +10,13 @@ import AdminLayout from "@/layout/admin.layout";
 // pages
 import HomePage from "@/page/home.page";
 import EventsPage from "@/page/event.page";
+import EventDetailsPage from "@/page/eventDetails.page";
 import BookingPage from "@/page/booking.page";
 import PaymentPage from "@/page/payment.page";
-import AdminDashboardPage from "@/page/adminDashboard.page";
-import OrganizerDashboardPage from "@/page/organizerDashboard.page";
-import AttendeeDashboardPage from "@/page/attendeeDashboard.page";
+import ProfilePage from "@/page/profile.page";
+import EventReviewPage from "@/page/eventReview.page";
+import AboutPage from "@/page/about.page";
+import ContactPage from "@/page/contact.page";
 import AuthPage from "@/page/auth.page";
 
 // auth features
@@ -29,7 +29,7 @@ import ResetPasswordFeature from "@/feature/auth/resetPassword.feature.auth";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/auth/login" replace />,
+    element: <Navigate to={RoutePath.LOGIN} replace />,
   },
   {
     path: RoutePath.AUTH,
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: RoutePath.HOME,
+    path: RoutePath.ATTENDEE,
     element: (
       <ProtectedRoute>
         <AttendeeLayout />
@@ -52,50 +52,94 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <HomePage /> },
-      { path: RoutePath.EVENTS.replace(/^\//, ""), element: <EventsPage /> },
-      {
-        path: RoutePath.BOOKING.replace(/^\//, ""),
-        element: <BookingPage />,
-      },
-      {
-        path: RoutePath.PAYMENT.replace(/^\//, ""),
-        element: <PaymentPage />,
-      },
+      { path: RoutePath.EVENTS, element: <EventsPage /> },
+      { path: "event/:id", element: <EventDetailsPage /> },
+      { path: "booking/:eventId", element: <BookingPage /> },
+      { path: "payment/:bookingId", element: <PaymentPage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "event-reviews", element: <EventReviewPage /> },
+      { path: "about", element: <AboutPage /> },
+      { path: "contact", element: <ContactPage /> },
     ],
   },
   {
-    path: RoutePath.DASHBOARD,
+    path: RoutePath.ORGANIZER,
     element: (
       <ProtectedRoute>
-        <RoleRedirect />
+        <OrganizerLayout />
       </ProtectedRoute>
     ),
     children: [
-      {
-        path: "admin",
-        element: (
-          <AdminLayout>
-            <AdminDashboardPage />
-          </AdminLayout>
-        ),
-      },
-      {
-        path: "organizer",
-        element: (
-          <OrganizerLayout>
-            <OrganizerDashboardPage />
-          </OrganizerLayout>
-        ),
-      },
-      {
-        path: "attendee",
-        element: (
-          <AttendeeLayout>
-            <AttendeeDashboardPage />
-          </AttendeeLayout>
-        ),
-      },
+      { index: true, element: <HomePage /> },
+      { path: RoutePath.EVENTS, element: <EventsPage /> },
+      { path: "event/:id", element: <EventDetailsPage /> },
+      { path: "booking/:eventId", element: <BookingPage /> },
+      { path: "payment/:bookingId", element: <PaymentPage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "event-reviews", element: <EventReviewPage /> },
+      { path: "about", element: <AboutPage /> },
+      { path: "contact", element: <ContactPage /> },
     ],
+  },
+  {
+    path: RoutePath.ADMIN,
+    element: (
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: RoutePath.EVENTS, element: <EventsPage /> },
+      { path: "event/:id", element: <EventDetailsPage /> },
+      { path: "booking/:eventId", element: <BookingPage /> },
+      { path: "payment/:bookingId", element: <PaymentPage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "event-reviews", element: <EventReviewPage /> },
+      { path: "about", element: <AboutPage /> },
+      { path: "contact", element: <ContactPage /> },
+    ],
+  },
+  {
+    path: "events",
+    element: <ProtectedRoute redirectBasedOnRole={true} rolePath="events" />,
+  },
+  {
+    path: "event-reviews",
+    element: (
+      <ProtectedRoute redirectBasedOnRole={true} rolePath="event-reviews" />
+    ),
+  },
+  {
+    path: "profile",
+    element: <ProtectedRoute redirectBasedOnRole={true} rolePath="profile" />,
+  },
+  {
+    path: "about",
+    element: <ProtectedRoute redirectBasedOnRole={true} rolePath="about" />,
+  },
+  {
+    path: "contact",
+    element: <ProtectedRoute redirectBasedOnRole={true} rolePath="contact" />,
+  },
+  {
+    path: "event/:id",
+    element: <ProtectedRoute redirectBasedOnRole={true} rolePath="event/:id" />,
+  },
+  {
+    path: "booking/:eventId",
+    element: (
+      <ProtectedRoute redirectBasedOnRole={true} rolePath="booking/:eventId" />
+    ),
+  },
+  {
+    path: "payment/:bookingId",
+    element: (
+      <ProtectedRoute
+        redirectBasedOnRole={true}
+        rolePath="payment/:bookingId"
+      />
+    ),
   },
 ]);
 
