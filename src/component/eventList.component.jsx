@@ -1,23 +1,27 @@
-import { useEffect, useState, useCallback } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import useAxios from "../hook/useAxios.hook";
 import { useNavigate } from "react-router-dom";
 
 const EventListComponent = ({ category }) => {
-  const { fetchData, loading } = useAxios();
+  const { fetchData, loading, error } = useAxios();
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
-  const loadEvents = useCallback(async () => {
-    const url = category ? `/events?categoryId=${category.id}` : "/events";
-    const result = await fetchData({ url, method: "get" });
-    if (result && result.events) {
-      setEvents(result.events);
-    }
-  }, [category, fetchData]);
-
   useEffect(() => {
+    const loadEvents = async () => {
+      const url = category ? `/events?categoryId=${category.id}` : "/events";
+      const result = await fetchData({ url, method: "get" });
+      if (result && Array.isArray(result)) {
+        setEvents(result);
+      } else if (result && result.events) {
+        setEvents(result.events);
+      }
+    };
+
     loadEvents();
-  }, [loadEvents]);
+  }, [category]);
 
   const handleEventClick = (eventId) => {
     navigate(`/event/${eventId}`);
@@ -28,6 +32,24 @@ const EventListComponent = ({ category }) => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>{category ? `${category.name} Events` : "All Events"}</h2>
       </div>
+
+      {error && (
+        <div
+          className="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
+          <strong>Error loading events:</strong>{" "}
+          {typeof error === "string"
+            ? error
+            : "Failed to load events. Please check the console for details."}
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center">
@@ -52,7 +74,7 @@ const EventListComponent = ({ category }) => {
                   <img
                     src={
                       event.imageUrl ||
-                      "/placeholder.svg?height=250&width=400&query=event"
+                      "https://www.freepik.com/free-photo/concert-crowd-enjoying-music-festival_25567003.htm#fromView=keyword&page=1&position=0&uuid=3e2f3f3e-B7e0-4c6a-8b6d-5f5e3e6f1c2d&query=Concerts"
                     }
                     className="card-img-top"
                     alt={event.title}

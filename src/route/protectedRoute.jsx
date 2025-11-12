@@ -1,3 +1,5 @@
+"use client";
+
 import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "@/context/auth.context";
 import { RoutePath } from "@/enum";
@@ -24,7 +26,12 @@ const ProtectedRoute = ({
     const userRole = user?.role?.toUpperCase() || "ATTENDEE";
     const basePath = rolePathMap[userRole] || "/attendee";
 
-    return <Navigate to={`${basePath}/${rolePath}`} replace />;
+    let finalPath = rolePath;
+    Object.keys(params).forEach((key) => {
+      finalPath = finalPath.replace(`:${key}`, params[key]);
+    });
+
+    return <Navigate to={`${basePath}/${finalPath}`} replace />;
   }
 
   return children;

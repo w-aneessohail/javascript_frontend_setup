@@ -10,13 +10,12 @@ const CategoryComponent = ({ onSelectCategory }) => {
   useEffect(() => {
     const loadCategories = async () => {
       const result = await fetchData({ url: "/categories", method: "get" });
-      if (result && result.categories) {
-        setCategories(result.categories);
+      if (Array.isArray(result)) {
+        setCategories(result);
       }
     };
-
     loadCategories();
-  }, []); // Empty dependency array - only runs once on mount
+  }, []);
 
   return (
     <div className="container py-4">
@@ -39,8 +38,7 @@ const CategoryComponent = ({ onSelectCategory }) => {
                 <img
                   src={
                     category.imageUrl ||
-                    "/placeholder.svg?height=200&width=300&query=category" ||
-                    "/placeholder.svg"
+                    "https://www.freepik.com/free-photo/excited-audience-watching-confetti-fireworks-having-fun-music-festival-night-copy-space_25566947.htm#fromView=keyword&page=1&position=0&uuid=f08f4fb9-f319-4bd9-93da-eebf4f58db54&query=Concerts"
                   }
                   className="card-img-top"
                   alt={category.name}

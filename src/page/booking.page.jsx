@@ -19,7 +19,7 @@ const BookingPage = () => {
     if (result && result.event) {
       setEvent(result.event);
     }
-  }, [eventId, fetchData]);
+  }, [eventId]);
 
   useEffect(() => {
     loadEventDetails();

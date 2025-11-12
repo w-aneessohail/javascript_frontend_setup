@@ -1,4 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+"use client";
+
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useAxios from "../hook/useAxios.hook";
 
@@ -6,18 +8,36 @@ const EventDetailsPage = () => {
   const { id } = useParams();
   const { fetchData, loading } = useAxios();
   const [event, setEvent] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  const loadEventDetails = useCallback(async () => {
-    const result = await fetchData({ url: `/events/${id}`, method: "get" });
-    if (result && result.event) {
-      setEvent(result.event);
-    }
-  }, [id, fetchData]);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
+    const loadEventDetails = async () => {
+      const eventId = Number.parseInt(id, 10);
+
+      if (isNaN(eventId)) {
+        setError("Invalid event ID");
+        return;
+      }
+
+      const result = await fetchData({
+        url: `/events/${eventId}`,
+        method: "get",
+      });
+
+      if (result) {
+        setEvent(result);
+      } else {
+        setError("Failed to load event details");
+      }
+    };
+
     loadEventDetails();
-  }, [loadEventDetails]);
+  }, []); // Remove fetchData from dependencies to prevent infinite loops
 
   const handleBookNow = () => {
     navigate(`/booking/${id}`);
@@ -31,6 +51,10 @@ const EventDetailsPage = () => {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return <div className="text-center py-5 text-danger">{error}</div>;
   }
 
   if (!event) {
@@ -53,10 +77,10 @@ const EventDetailsPage = () => {
               className={`carousel-item ${index === 0 ? "active" : ""}`}
             >
               <img
-                src={image || "/placeholder.svg"}
+                src={image.imageUrl || image || "/placeholder.svg"}
                 className="d-block w-100"
                 alt={`${event.title} ${index + 1}`}
-                style={{ height: "500px", objectFit: "cover" }}
+                style={{ height: "300px", objectFit: "cover" }}
               />
             </div>
           ))}
@@ -97,14 +121,23 @@ const EventDetailsPage = () => {
                   {new Date(event.eventDate).toLocaleDateString()}
                 </li>
                 <li className="mb-2">
-                  <strong>Location:</strong> {event.location}
+                  <strong>Location:</strong> {event.address}
                 </li>
                 <li className="mb-2">
                   <strong>Price:</strong>{" "}
-                  {event.price ? `$${event.price}` : "Free"}
+                  {event.ticketPrice
+                    ? `$${Number.parseFloat(event.ticketPrice).toFixed(2)}`
+                    : "Free"}
                 </li>
                 <li className="mb-2">
-                  <strong>Available Seats:</strong> {event.availableSeats}
+                  <strong>Available Seats:</strong> {event.availableTickets}
+                </li>
+                <li className="mb-2">
+                  <strong>Organizer:</strong>{" "}
+                  {event.organizer?.organizationName}
+                </li>
+                <li className="mb-2">
+                  <strong>Category:</strong> {event.category?.name}
                 </li>
               </ul>
             </div>
@@ -112,10 +145,12 @@ const EventDetailsPage = () => {
         </div>
 
         <div className="col-lg-4">
-          <div className="card sticky-top" style={{ top: "20px" }}>
+          <div className="card" style={{ position: "relative" }}>
             <div className="card-body">
               <h4 className="card-title mb-3">
-                {event.price ? `$${event.price}` : "Free"}
+                {event.ticketPrice
+                  ? `$${Number.parseFloat(event.ticketPrice).toFixed(2)}`
+                  : "Free"}
               </h4>
               <button
                 className="btn btn-primary btn-lg w-100"
@@ -124,7 +159,7 @@ const EventDetailsPage = () => {
                 Book Now
               </button>
               <p className="text-muted text-center mt-3 mb-0">
-                <small>{event.availableSeats} seats available</small>
+                <small>{event.availableTickets} seats available</small>
               </p>
             </div>
           </div>
