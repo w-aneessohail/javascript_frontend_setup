@@ -1,5 +1,3 @@
-"use client";
-
 import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "@/context/auth.context";
 import { RoutePath } from "@/enum";
@@ -9,8 +7,21 @@ const ProtectedRoute = ({
   redirectBasedOnRole = false,
   rolePath,
 }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading, initialized } = useAuth();
   const params = useParams();
+
+  if (!initialized || loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to={RoutePath.LOGIN} replace />;

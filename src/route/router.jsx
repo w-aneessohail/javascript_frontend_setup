@@ -26,10 +26,12 @@ import OtpFeature from "@/feature/auth/otp.feature.auth";
 import ForgotPasswordFeature from "@/feature/auth/forgotPassword.feature.auth";
 import ResetPasswordFeature from "@/feature/auth/resetPassword.feature.auth";
 
+import RoleBasedRedirect from "@/route/roleRedirect";
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to={RoutePath.LOGIN} replace />,
+    element: <RoleBasedRedirect />,
   },
   {
     path: RoutePath.AUTH,

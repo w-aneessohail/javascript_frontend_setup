@@ -10,14 +10,20 @@ import { useAuth } from "@/context/auth.context";
 
 const LoginFeature = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, loading: authLoading } = useAuth();
   const loginApi = useAxios();
   const { fetchData, error, loading, response } = loginApi;
 
   useEffect(() => {
     if (response && response.user) {
       const { user } = response;
+      console.log("[v0] Login successful, user:", user);
       setUser(user);
+
+      document.cookie =
+        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
       if (user.role === UserRole.ATTENDEE) navigate("/attendee");
       else if (user.role === UserRole.ORGANIZER) navigate("/organizer");
@@ -36,6 +42,7 @@ const LoginFeature = () => {
     initialValues: { email: "", password: "" },
     validationSchema,
     onSubmit: async (values) => {
+      console.log("[v0] Submitting login with credentials:", values.email);
       await fetchData({
         url: "/login",
         method: HttpMethod.POST,
