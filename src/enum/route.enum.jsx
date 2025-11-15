@@ -1,4 +1,4 @@
-export const RoutePath = Object.freeze({
+export const RoutePath = {
   HOME: "/",
   AUTH: "/auth",
   LOGIN: "/auth/login",
@@ -6,6 +6,7 @@ export const RoutePath = Object.freeze({
   OTP: "/auth/otp",
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
+<<<<<<< HEAD
 
   // Role-based layout paths
   ATTENDEE: "/attendee",
@@ -21,3 +22,10 @@ export const RoutePath = Object.freeze({
   ABOUT: "about",
   CONTACT: "contact",
 });
+=======
+  DASHBOARD: "/dashboard",
+  ADMIN_DASHBOARD: "/dashboard/admin",
+  ORGANIZER_DASHBOARD: "/dashboard/organizer",
+  ATTENDEE_DASHBOARD: "/dashboard/attendee",
+};
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530

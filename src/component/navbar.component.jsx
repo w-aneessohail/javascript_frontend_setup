@@ -1,10 +1,14 @@
+<<<<<<< HEAD
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth.context";
+=======
+import { useAuth } from "@/context/auth.context";
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, isAuthenticated, setUser } = useAuth();
 
+<<<<<<< HEAD
   const handleLogout = () => {
     logout();
     navigate("/auth/login");
@@ -92,6 +96,52 @@ const Navbar = () => {
             </Link>
           )}
         </div>
+=======
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5002/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        console.log("Logout failed:", res.statusText);
+        return;
+      }
+
+      // Clear user from context after successful logout
+      setUser(null);
+      console.log("Logout successful");
+    } catch (err) {
+      console.log("Logout error:", err.message);
+    }
+  };
+
+  return (
+    <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
+      <a className="navbar-brand" href="/">
+        MyApp
+      </a>
+
+      <div className="ms-auto">
+        {isAuthenticated ? (
+          <>
+            <span className="me-3">
+              Welcome, <strong>{user?.name || user?.email}</strong>
+            </span>
+            <button
+              className="btn btn-outline-danger btn-sm"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <a href="/login" className="btn btn-outline-primary btn-sm">
+            Login
+          </a>
+        )}
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
       </div>
     </nav>
   );

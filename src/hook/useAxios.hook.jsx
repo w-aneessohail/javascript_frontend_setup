@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useCallback, useEffect } from "react";
+=======
+import { useState } from "react";
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -36,6 +40,7 @@ const useAxios = (logoutFn) => {
     logoutCallback = logoutFn;
   }, [logoutFn]);
 
+<<<<<<< HEAD
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.response.use(
       (res) => res,
@@ -124,6 +129,32 @@ const useAxios = (logoutFn) => {
     },
     []
   );
+=======
+  axiosInstance.interceptors.request.use((config) => {
+    // Cookies are automatically included with credentials: true
+    // Only access_token and refresh_token should be set by backend
+    return config;
+  });
+
+  const fetchData = async ({ url, method = "get", data = {}, params = {} }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await axiosInstance({ url, method, data, params });
+      setResponse(res.data);
+      return res.data;
+    } catch (err) {
+      console.error("API Error:", err);
+      const errMsg =
+        err.response?.data?.message || err.response?.data || err.message;
+      setError(errMsg);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 
   return { response, error, loading, fetchData };
 };

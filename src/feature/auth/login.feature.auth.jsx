@@ -1,21 +1,38 @@
+<<<<<<< HEAD
 import { useEffect } from "react";
+=======
+"use client";
+
+import { useEffect, useState } from "react";
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import CustomInputField from "@/component/customInput.component";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import useAxios from "@/hook/useAxios.hook";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { RoutePath, HttpMethod, UserRole } from "@/enum";
+=======
+import { RoutePath, HttpMethod } from "@/enum";
+import { UserRole } from "@/enum/userRole.enum";
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import { useAuth } from "@/context/auth.context";
 
 const LoginFeature = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
   const { setUser, loading: authLoading } = useAuth();
+=======
+  const { setUser } = useAuth();
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
   const loginApi = useAxios();
   const { fetchData, error, loading, response } = loginApi;
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     if (response && response.user) {
+<<<<<<< HEAD
       const { user } = response;
       console.log("[v0] Login successful, user:", user);
       setUser(user);
@@ -28,6 +45,25 @@ const LoginFeature = () => {
       if (user.role === UserRole.ATTENDEE) navigate("/attendee");
       else if (user.role === UserRole.ORGANIZER) navigate("/organizer");
       else if (user.role === UserRole.ADMIN) navigate("/admin");
+=======
+      const userData = response.user;
+      setUser(userData);
+      setRedirecting(true);
+
+      const redirectTimer = setTimeout(() => {
+        if (userData.role === UserRole.ATTENDEE) {
+          navigate(RoutePath.HOME);
+        } else if (userData.role === UserRole.ORGANIZER) {
+          navigate(RoutePath.ORGANIZER_DASHBOARD);
+        } else if (userData.role === UserRole.ADMIN) {
+          navigate(RoutePath.ADMIN_DASHBOARD);
+        } else {
+          navigate(RoutePath.HOME);
+        }
+      }, 100);
+
+      return () => clearTimeout(redirectTimer);
+>>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
     }
   }, [response, navigate, setUser]);
 
@@ -64,6 +100,12 @@ const LoginFeature = () => {
           </Alert>
         )}
 
+        {redirecting && (
+          <Alert variant="info" className="text-center">
+            Login successful! Redirecting...
+          </Alert>
+        )}
+
         <Form onSubmit={formik.handleSubmit}>
           <CustomInputField
             name="email"
@@ -73,6 +115,7 @@ const LoginFeature = () => {
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={redirecting}
           />
           {formik.touched.email && formik.errors.email && (
             <div className="text-danger small">{formik.errors.email}</div>
@@ -86,6 +129,7 @@ const LoginFeature = () => {
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={redirecting}
           />
           {formik.touched.password && formik.errors.password && (
             <div className="text-danger small">{formik.errors.password}</div>
@@ -101,8 +145,16 @@ const LoginFeature = () => {
           </div>
 
           <div className="d-grid">
-            <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={loading || redirecting}
+            >
+              {redirecting
+                ? "Redirecting..."
+                : loading
+                ? "Logging in..."
+                : "Login"}
             </Button>
           </div>
         </Form>
