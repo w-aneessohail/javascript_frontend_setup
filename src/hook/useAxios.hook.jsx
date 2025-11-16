@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useState, useCallback, useEffect } from "react";
-=======
 import { useState } from "react";
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -40,96 +36,6 @@ const useAxios = (logoutFn) => {
     logoutCallback = logoutFn;
   }, [logoutFn]);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const interceptor = axiosInstance.interceptors.response.use(
-      (res) => res,
-      async (err) => {
-        const originalRequest = err.config;
-
-        if (originalRequest.url === "/refresh-token") {
-          console.warn("[v0] Refresh token request failed, logging out");
-          if (logoutCallback) logoutCallback();
-          return Promise.reject(err);
-        }
-
-        if (
-          (err.response?.status === 401 || err.response?.status === 403) &&
-          !originalRequest._retry
-        ) {
-          if (isRefreshing) {
-            return new Promise((resolve, reject) => {
-              failedQueue.push({ resolve, reject });
-            })
-              .then(() => {
-                return axiosInstance(originalRequest);
-              })
-              .catch((error) => {
-                if (logoutCallback) logoutCallback();
-                return Promise.reject(error);
-              });
-          }
-
-          originalRequest._retry = true;
-          isRefreshing = true;
-
-          try {
-            console.log("[v0] Attempting token refresh...");
-            const refreshResponse = await refreshAxios.post("/refresh-token");
-
-            if (refreshResponse.status === 200) {
-              console.log("[v0] Token refresh successful");
-              processQueue(null);
-              return axiosInstance(originalRequest);
-            } else {
-              throw new Error("Refresh failed with non-200 status");
-            }
-          } catch (refreshError) {
-            console.error("[v0] Token refresh failed", refreshError);
-            if (logoutCallback) logoutCallback();
-            processQueue(refreshError);
-            return Promise.reject(refreshError);
-          } finally {
-            isRefreshing = false;
-          }
-        }
-        return Promise.reject(err);
-      }
-    );
-
-    return () => {
-      axiosInstance.interceptors.response.eject(interceptor);
-    };
-  }, []);
-
-  const fetchData = useCallback(
-    async ({ url, method = "get", data = {}, params = {} }) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await axiosInstance({
-          url,
-          method,
-          data,
-          params,
-          withCredentials: true,
-        });
-        setResponse(res.data);
-        return res.data;
-      } catch (err) {
-        console.error("[v0] API Error:", err.message);
-        const errMsg =
-          err.response?.data?.message || err.response?.data || err.message;
-        setError(errMsg);
-        return null;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-=======
   axiosInstance.interceptors.request.use((config) => {
     // Cookies are automatically included with credentials: true
     // Only access_token and refresh_token should be set by backend
@@ -154,7 +60,6 @@ const useAxios = (logoutFn) => {
       setLoading(false);
     }
   };
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 
   return { response, error, loading, fetchData };
 };

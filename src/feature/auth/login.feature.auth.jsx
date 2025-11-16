@@ -1,51 +1,25 @@
-<<<<<<< HEAD
-import { useEffect } from "react";
-=======
 "use client";
 
 import { useEffect, useState } from "react";
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import CustomInputField from "@/component/customInput.component";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import useAxios from "@/hook/useAxios.hook";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { RoutePath, HttpMethod, UserRole } from "@/enum";
-=======
 import { RoutePath, HttpMethod } from "@/enum";
 import { UserRole } from "@/enum/userRole.enum";
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
 import { useAuth } from "@/context/auth.context";
 
 const LoginFeature = () => {
   const navigate = useNavigate();
-<<<<<<< HEAD
-  const { setUser, loading: authLoading } = useAuth();
-=======
   const { setUser } = useAuth();
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
   const loginApi = useAxios();
   const { fetchData, error, loading, response } = loginApi;
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     if (response && response.user) {
-<<<<<<< HEAD
-      const { user } = response;
-      console.log("[v0] Login successful, user:", user);
-      setUser(user);
-
-      document.cookie =
-        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie =
-        "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      if (user.role === UserRole.ATTENDEE) navigate("/attendee");
-      else if (user.role === UserRole.ORGANIZER) navigate("/organizer");
-      else if (user.role === UserRole.ADMIN) navigate("/admin");
-=======
       const userData = response.user;
       setUser(userData);
       setRedirecting(true);
@@ -63,7 +37,6 @@ const LoginFeature = () => {
       }, 100);
 
       return () => clearTimeout(redirectTimer);
->>>>>>> 6f288e458fb1f70bdae17f2d10fa650c42343530
     }
   }, [response, navigate, setUser]);
 
