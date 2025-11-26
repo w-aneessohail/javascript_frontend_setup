@@ -1,58 +1,52 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/auth.context";
+import { useAuth } from "@/context/auth.context";
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, isAuthenticated, setUser } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5002/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        console.log("Logout failed:", res.statusText);
+        return;
+      }
+
+      // Clear user from context after successful logout
+      setUser(null);
+      console.log("Logout successful");
+    } catch (err) {
+      console.log("Logout error:", err.message);
+    }
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
-      <Link to="/" className="navbar-brand fw-bold">
-        EventX
-      </Link>
-      <div className="navbar-nav ms-auto">
-        <Link to="/" className="nav-link">
-          Home
-        </Link>
-        <Link to="/events" className="nav-link">
-          Events
-        </Link>
-        <Link to="/booking" className="nav-link">
-          Booking
-        </Link>
-        <Link to="/auth/login" className="nav-link">
-          Login
-        </Link>
+      <a className="navbar-brand" href="/">
+        MyApp
+      </a>
 
+      <div className="ms-auto">
         {isAuthenticated ? (
-          <div className="dropdown ms-3">
+          <>
+            <span className="me-3">
+              Welcome, <strong>{user?.name || user?.email}</strong>
+            </span>
             <button
-              className="btn btn-outline-secondary dropdown-toggle"
-              data-bs-toggle="dropdown"
+              className="btn btn-outline-danger btn-sm"
+              onClick={handleLogout}
             >
-              <img
-                src={user?.profileImageUrl || "/default-avatar.png"}
-                alt="profile"
-                style={{ width: "30px", borderRadius: "50%", marginRight: 6 }}
-              />
-              {user?.firstName || "User"}
+              Logout
             </button>
-            <ul className="dropdown-menu">
-              <li className="dropdown-item">{user?.email}</li>
-              <li>
-                <button className="dropdown-item" onClick={handleLogout}>
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </div>
-        ) : null}
+          </>
+        ) : (
+          <a href="/login" className="btn btn-outline-primary btn-sm">
+            Login
+          </a>
+        )}
       </div>
     </nav>
   );
